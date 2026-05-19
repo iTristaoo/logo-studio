@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Marca — Descobridor de Estilo de Logotipo</title>
+<meta name="description" content="Painel interativo para descobrir o estilo de logo ideal para sua empresa." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Poppins:wght@600;700;800&family=Playfair+Display:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&family=Quicksand:wght@600;700&family=Pacifico&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FBFAF7;
+    --card: #FFFFFF;
+    --ink: #19191A;
+    --ink-soft: #54524C;
+    --ink-mute: #908D84;
+    --line: #E7E4DC;
+    --line-2: #D6D2C7;
+    --hl: #F1EEE6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    letter-spacing: -0.011em;
+    line-height: 1.5;
+    font-size: 16px;
+  }
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* HEADER */
+  header.top {
+    border-bottom: 1px solid var(--line);
+    background: rgba(251,250,247,0.9);
+    backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .top-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo-wm { display: flex; align-items: center; gap: 10px; }
+  .logo-wm .dot { width: 26px; height: 26px; border-radius: 7px; background: var(--ink); position: relative; }
+  .logo-wm .dot::after { content:''; position:absolute; inset:8px; border-radius:50%; background:var(--paper); }
+  .logo-wm b { font-size: 18px; font-weight: 700; letter-spacing: -0.03em; }
+  .logo-wm span { font-size: 12px; color: var(--ink-mute); }
+  .step-pill {
+    font-size: 12px; color: var(--ink-soft);
+    background: var(--card); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 999px; font-weight: 500;
+  }
+
+  /* PROGRESS */
+  .progress { height: 3px; background: var(--line); }
+  .progress > div { height: 100%; background: var(--ink); transition: width .4s cubic-bezier(.16,1,.3,1); }
+
+  /* SCREENS */
+  .screen { display: none; padding: 56px 0 90px; }
+  .screen.active { display: block; animation: fade .4s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  /* INTRO */
+  .intro { text-align: center; max-width: 680px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .intro h1 { font-size: clamp(40px, 7vw, 78px); line-height: 1.0; margin-top: 16px; }
+  .intro h1 i { font-style: italic; }
+  .intro p { font-size: 18px; color: var(--ink-soft); margin-top: 22px; }
+  .intro-marks {
+    display: flex; justify-content: center; gap: 14px; margin: 40px 0;
+    flex-wrap: wrap;
+  }
+  .intro-mark {
+    width: 76px; height: 76px; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* QUESTION */
+  .q-head { max-width: 720px; }
+  .q-num { font-size: 13px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.08em; }
+  .q-head h2 { font-size: clamp(30px, 4.5vw, 48px); line-height: 1.05; margin-top: 8px; }
+  .q-head p { color: var(--ink-soft); margin-top: 12px; font-size: 16px; }
+  .specialist {
+    display: flex; gap: 12px; margin-top: 22px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; max-width: 640px;
+  }
+  .specialist .av {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--ink); color: var(--paper); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .specialist p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .specialist b { color: var(--ink); }
+
+  /* OPTION GRID */
+  .opt-grid { display: grid; gap: 14px; margin-top: 34px; }
+  .opt-grid.cols-2 { grid-template-columns: repeat(2,1fr); }
+  .opt-grid.cols-3 { grid-template-columns: repeat(3,1fr); }
+  .opt-grid.cols-5 { grid-template-columns: repeat(5,1fr); }
+  @media (max-width: 860px) {
+    .opt-grid.cols-3, .opt-grid.cols-5 { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 560px) {
+    .opt-grid.cols-2, .opt-grid.cols-3, .opt-grid.cols-5 { grid-template-columns: 1fr; }
+  }
+  .opt {
+    background: var(--card); border: 1.5px solid var(--line);
+    border-radius: 14px; padding: 18px; cursor: pointer;
+    transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+    text-align: left; position: relative;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .opt:hover { border-color: var(--line-2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+  .opt.selected { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(25,25,26,0.08); }
+  .opt.selected .opt-check { opacity: 1; transform: scale(1); }
+  .opt-check {
+    position: absolute; top: 12px; right: 12px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: scale(0.6); transition: all .15s ease;
+  }
+  .opt-visual {
+    height: 96px; border-radius: 10px; background: var(--hl);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .opt-visual.tall { height: 120px; }
+  .opt-title { font-weight: 600; font-size: 15.5px; }
+  .opt-desc { font-size: 13px; color: var(--ink-mute); margin-top: -6px; }
+  .opt-ico {
+    width: 46px; height: 46px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--hl);
+  }
+
+  /* palette swatch option */
+  .pal-swatches { display: flex; gap: 0; border-radius: 8px; overflow: hidden; height: 56px; }
+  .pal-swatches > div { flex: 1; }
+
+  /* NAV */
+  .q-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 38px; gap: 14px;
+  }
+  .btn {
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    padding: 13px 26px; border-radius: 10px; cursor: pointer;
+    border: 1.5px solid var(--ink); transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: #000; }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-2); }
+  .btn-ghost:hover { border-color: var(--ink); }
+  .btn-lg { padding: 16px 34px; font-size: 16px; }
+
+  /* RESULT */
+  .result-head { text-align: center; max-width: 720px; margin: 0 auto 44px; }
+  .result-head h2 { font-size: clamp(34px,5vw,60px); line-height: 1.04; margin-top: 14px; }
+  .result-head h2 i { font-style: italic; }
+  .rec-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  @media (max-width: 820px) { .rec-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 480px) { .rec-grid { grid-template-columns: 1fr; } }
+  .rec {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 18px;
+  }
+  .rec-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; }
+  .rec-value { font-size: 20px; font-weight: 700; margin-top: 8px; letter-spacing: -0.02em; }
+  .rec-note { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+  .rec-pal { display: flex; gap: 5px; margin-top: 10px; }
+  .rec-pal > div { width: 26px; height: 26px; border-radius: 6px; }
+
+  .brief {
+    background: var(--ink); color: var(--paper);
+    border-radius: 18px; padding: 34px; margin-top: 16px;
+  }
+  .brief .eyebrow { color: rgba(255,255,255,0.45); }
+  .brief h3 { font-size: 26px; margin-top: 10px; }
+  .brief p { color: rgba(255,255,255,0.72); margin-top: 14px; font-size: 15px; line-height: 1.6; }
+  .brief-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px; }
+  @media (max-width: 640px) { .brief-cols { grid-template-columns: 1fr; } }
+  .brief-list h4 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .brief-list li {
+    list-style: none; font-size: 14px; color: rgba(255,255,255,0.85);
+    padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .brief-list li .mk { flex-shrink: 0; margin-top: 2px; }
+
+  .gallery-head { display: flex; align-items: end; justify-content: space-between; margin: 50px 0 20px; flex-wrap: wrap; gap: 12px; }
+  .gallery-head h3 { font-size: 30px; }
+  .gallery-head p { font-size: 14px; color: var(--ink-mute); }
+  .logo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  @media (max-width: 820px) { .logo-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 520px) { .logo-grid { grid-template-columns: 1fr; } }
+  .logo-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden;
+    transition: border-color .15s, transform .12s, box-shadow .15s;
+  }
+  .logo-card:hover { border-color: var(--line-2); transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.07); }
+  .logo-stage {
+    height: 168px; display: flex; align-items: center; justify-content: center;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0/100% 28px,
+      var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo-foot { padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .logo-foot .nm { font-size: 13px; font-weight: 600; }
+  .logo-foot .tg { font-size: 11px; color: var(--ink-mute); }
+  .pill-mini {
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--ink-soft); background: var(--hl);
+    padding: 3px 7px; border-radius: 5px;
+  }
+
+  /* LOGO RENDER (composed) */
+  .logo-render { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; }
+  .logo-render.lay-stack { flex-direction: column; gap: 9px; }
+  .logo-render.lay-wordmark, .logo-render.lay-monogram { gap: 0; }
+  .logo-name { line-height: 1; white-space: nowrap; }
+  .logo-badge {
+    border: 2.5px solid currentColor; border-radius: 50%;
+    width: 118px; height: 118px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .logo-badge .bdg-line { font-size: 7px; letter-spacing: 0.22em; text-transform: uppercase; }
+  .mono-box {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 16px;
+  }
+
+  footer.foot {
+    border-top: 1px solid var(--line); padding: 26px 0;
+    font-size: 12px; color: var(--ink-mute);
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .restart-bar { text-align: center; margin-top: 50px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="logo-wm">
+      <span class="dot"></span>
+      <div>
+        <b>Marca</b><br>
+        <span>Estúdio de identidade visual</span>
+      </div>
+    </div>
+    <div class="step-pill" id="stepPill">Início</div>
+  </div>
+</header>
+<div class="progress"><div id="progressBar" style="width:0%"></div></div>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="screen active" data-screen="intro">
+    <div class="intro">
+      <p class="eyebrow">Descobridor de estilo · logotipo</p>
+      <h1 class="serif">Qual é a cara da <i>sua marca?</i></h1>
+      <p>Cinco perguntas visuais. A cada escolha entendemos melhor o gosto e a personalidade do seu negócio — e no final entregamos uma direção de logo sob medida, com referências reais.</p>
+      <div class="intro-marks" id="introMarks"></div>
+      <button class="btn btn-primary btn-lg" onclick="Quiz.start()">
+        Começar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <p style="font-size:13px;color:var(--ink-mute);margin-top:18px">Leva 1 minuto · sem cadastro</p>
+    </div>
+  </section>
+
+  <!-- QUESTION SCREENS injected by JS -->
+  <section class="screen" data-screen="quiz">
+    <div class="q-head">
+      <div class="q-num" id="qNum">Pergunta 1 de 5</div>
+      <h2 class="serif" id="qTitle"></h2>
+      <p id="qDesc"></p>
+      <div class="specialist">
+        <div class="av">M</div>
+        <p id="qTip"></p>
+      </div>
+    </div>
+    <div class="opt-grid" id="qOptions"></div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" id="btnBack" onclick="Quiz.back()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Voltar
+      </button>
+      <button class="btn btn-primary" id="btnNext" onclick="Quiz.next()" disabled>
+        Continuar
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" data-screen="result">
+    <div class="result-head">
+      <p class="eyebrow">Sua direção de marca</p>
+      <h2 class="serif" id="resultTitle"></h2>
+    </div>
+    <div class="rec-grid" id="recGrid"></div>
+    <div class="brief" id="briefBox"></div>
+    <div class="gallery-head">
+      <div>
+        <h3 class="serif">Referências para o seu estilo</h3>
+        <p id="galleryNote"></p>
+      </div>
+    </div>
+    <div class="logo-grid" id="logoGrid"></div>
+    <div class="restart-bar">
+      <button class="btn btn-ghost" onclick="Quiz.restart()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+        Refazer o teste
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%;gap:12px;flex-wrap:wrap">
+    <span>Marca · painel demonstrativo — referências de logo geradas para fins de estudo</span>
+    <span>Especialista em identidade visual para empresas brasileiras</span>
+  </div>
+</footer>
+
+<script>
+/* ===================================================================
+   MARCA — Logo style discovery panel
+   Logo specialist for Brazilian companies. Visual, interactive.
+   =================================================================== */
+
+/* ---------- PALETTES ---------- */
+const PALETTES = {
+  confianca: { name:'Confiança',   ink:'#1E3A5F', accent:'#3B6FB5', soft:'#E8EEF6', swatches:['#1E3A5F','#3B6FB5','#9DB9D8','#E8EEF6'] },
+  natureza:  { name:'Natureza',    ink:'#1F4A2C', accent:'#4CA86A', soft:'#E6F2E9', swatches:['#1F4A2C','#4CA86A','#A6D4B4','#E6F2E9'] },
+  energia:   { name:'Energia',     ink:'#A12E1B', accent:'#F2722B', soft:'#FCEBE2', swatches:['#A12E1B','#F2722B','#F7B98F','#FCEBE2'] },
+  premium:   { name:'Premium',     ink:'#161616', accent:'#B89148', soft:'#F1ECE0', swatches:['#161616','#B89148','#D8C79C','#F1ECE0'] },
+  tech:      { name:'Tecnologia',  ink:'#2A1E63', accent:'#6D4FE0', soft:'#ECE8FB', swatches:['#2A1E63','#6D4FE0','#B3A4EE','#ECE8FB'] },
+  acolhedor: { name:'Acolhedor',   ink:'#7A3B1E', accent:'#E08A4B', soft:'#FBEEE2', swatches:['#7A3B1E','#E08A4B','#F0C49E','#FBEEE2'] },
+  saude:     { name:'Saúde & bem-estar', ink:'#0F5159', accent:'#23A6A6', soft:'#E2F4F4', swatches:['#0F5159','#23A6A6','#9AD6D6','#E2F4F4'] },
+  doce:      { name:'Doçura',      ink:'#6B3A2A', accent:'#D08A3E', soft:'#F6ECDF', swatches:['#6B3A2A','#D08A3E','#E6C79A','#F6ECDF'] },
+  vibrante:  { name:'Vibrante',    ink:'#7A1F52', accent:'#E84B8A', soft:'#FBE6F0', swatches:['#7A1F52','#E84B8A','#F4A8C9','#FBE6F0'] },
+};
+
+/* ---------- FONTS ---------- */
+const FONTS = {
+  geometrico: "'Poppins', sans-serif",
+  serif:      "'Playfair Display', serif",
+  moderno:    "'Space Grotesk', sans-serif",
+  arredondado:"'Quicksand', sans-serif",
+  manuscrito: "'Pacifico', cursive",
+};
+
+/* ---------- MARKS (SVG symbols, 64x64) ---------- */
+const MARKS = {
+  hexagono:(i,a)=>`<path d="M32 5 56 18.5V45.5L32 59 8 45.5V18.5Z" fill="${a}"/><path d="M32 19 44 26V40L32 47 20 40V26Z" fill="#fff"/>`,
+  circulos:(i,a)=>`<circle cx="25" cy="32" r="18" fill="${i}"/><circle cx="39" cy="32" r="18" fill="${a}" fill-opacity="0.82"/>`,
+  folha:(i,a)=>`<path d="M32 7C17 16 13 38 23 55 41 47 53 28 45 9 40 18 35 14 32 7Z" fill="${a}"/><path d="M29 50C27 38 30 24 40 15" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round"/>`,
+  crescimento:(i,a)=>`<rect x="11" y="38" width="11" height="18" rx="2.5" fill="${i}"/><rect x="26.5" y="26" width="11" height="30" rx="2.5" fill="${a}"/><rect x="42" y="13" width="11" height="43" rx="2.5" fill="${a}"/><path d="M14 32 32 18 50 6" stroke="${i}" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="6" r="4" fill="${i}"/>`,
+  anel:(i,a)=>`<circle cx="32" cy="32" r="21" fill="none" stroke="${a}" stroke-width="9" stroke-dasharray="92 40" stroke-linecap="round" transform="rotate(-45 32 32)"/><circle cx="32" cy="32" r="6" fill="${i}"/>`,
+  onda:(i,a)=>`<path d="M6 36Q19 20 32 36T58 36" stroke="${a}" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M6 49Q19 33 32 49T58 49" stroke="${i}" stroke-width="6.5" fill="none" stroke-linecap="round" opacity="0.5"/>`,
+  diamante:(i,a)=>`<path d="M32 6 57 32 32 58 7 32Z" fill="${a}"/><path d="M32 19 45 32 32 45 19 32Z" fill="#fff"/>`,
+  raio:(i,a)=>`<path d="M37 5 15 35H30L26 59 49 27H34Z" fill="${a}"/>`,
+  telhado:(i,a)=>`<path d="M32 9 59 33H51V55H13V33H5Z" fill="${a}"/><rect x="26" y="38" width="12" height="17" rx="1.5" fill="#fff"/>`,
+  cruz:(i,a)=>`<path d="M26 7H38V26H57V38H38V57H26V38H7V26H26Z" fill="${a}"/>`,
+  escudo:(i,a)=>`<path d="M32 5 55 14V32C55 47 45 56 32 60 19 56 9 47 9 32V14Z" fill="${a}"/><path d="M23 33 30 40 43 24" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  gota:(i,a)=>`<path d="M32 6C32 6 49 28 49 41A17 17 0 0 1 15 41C15 28 32 6 32 6Z" fill="${a}"/><path d="M27 41A8 8 0 0 0 35 49" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round"/>`,
+  chama:(i,a)=>`<path d="M33 5C42 18 30 23 35 34 37 27 44 30 44 39A12 12 0 0 1 20 39C20 25 33 22 33 5Z" fill="${a}"/>`,
+  montanha:(i,a)=>`<path d="M5 53 25 18 37 38 45 25 59 53Z" fill="${a}"/><path d="M25 18 32 30 27 35 21 28Z" fill="#fff" opacity="0.75"/>`,
+  orbita:(i,a)=>`<ellipse cx="32" cy="32" rx="26" ry="11" fill="none" stroke="${a}" stroke-width="3.4" transform="rotate(28 32 32)"/><circle cx="32" cy="32" r="9" fill="${i}"/><circle cx="53" cy="22" r="4.5" fill="${a}"/>`,
+  pontos:(i,a)=>{let s='';const c=[[a,i,a],[i,a,i],[a,i,a]];for(let r=0;r<3;r++)for(let q=0;q<3;q++)s+=`<circle cx="${18+q*14}" cy="${18+r*14}" r="6" fill="${c[r][q]}"/>`;return s;},
+  mascote:(i,a)=>`<circle cx="32" cy="33" r="24" fill="${a}"/><path d="M14 20 22 12 26 22Z" fill="${a}"/><path d="M50 20 42 12 38 22Z" fill="${a}"/><circle cx="24" cy="30" r="4.2" fill="#fff"/><circle cx="40" cy="30" r="4.2" fill="#fff"/><circle cx="24.5" cy="31" r="2" fill="${i}"/><circle cx="40.5" cy="31" r="2" fill="${i}"/><path d="M24 42Q32 50 40 42" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/>`,
+  trigo:(i,a)=>`<path d="M32 8V56" stroke="${i}" stroke-width="3.4" stroke-linecap="round"/><g fill="${a}">${[16,25,34,43].map(y=>`<path d="M32 ${y}C26 ${y-3} 22 ${y+1} 21 ${y+7}C27 ${y+6} 31 ${y+3} 32 ${y}Z"/><path d="M32 ${y}C38 ${y-3} 42 ${y+1} 43 ${y+7}C37 ${y+6} 33 ${y+3} 32 ${y}Z"/>`).join('')}</g>`,
+  xicara:(i,a)=>`<path d="M14 22H44V40A12 12 0 0 1 32 52H26A12 12 0 0 1 14 40Z" fill="${a}"/><path d="M44 26H50A7 7 0 0 1 50 40H44" fill="none" stroke="${a}" stroke-width="4.5"/><path d="M22 8C20 12 24 14 22 18M32 8C30 12 34 14 32 18" stroke="${i}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  patas:(i,a)=>`<circle cx="32" cy="40" r="13" fill="${a}"/><circle cx="18" cy="26" r="6.5" fill="${a}"/><circle cx="32" cy="20" r="6.5" fill="${a}"/><circle cx="46" cy="26" r="6.5" fill="${a}"/>`,
+};
+
+const MARK_KEYS = Object.keys(MARKS);
+
+/* ---------- LOGO RENDERER ---------- */
+function svgMark(markKey, pal, size=54){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">${MARKS[markKey](pal.ink, pal.accent)}</svg>`;
+}
+
+function renderLogo(b, opts={}){
+  const pal = PALETTES[b.palette];
+  const font = FONTS[b.font] || FONTS.geometrico;
+  const scale = opts.scale || 1;
+  const nameSize = (b.font==='serif'?27:b.font==='manuscrito'?26:23) * scale;
+  const nameWeight = b.font==='manuscrito'?400:(b.font==='serif'?700:700);
+  const initials = b.name.split(' ').filter(w=>!/^(e|&|da|de|do)$/i.test(w)).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  const nameEl = (sz=nameSize, color=pal.ink)=>
+    `<span class="logo-name" style="font-family:${font};font-size:${sz}px;font-weight:${nameWeight};color:${color}">${b.name}</span>`;
+
+  if (b.type==='wordmark'){
+    return `<div class="logo-render lay-wordmark">${nameEl(nameSize*1.15)}</div>`;
+  }
+  if (b.type==='monograma'){
+    const boxSize = 96*scale;
+    return `<div class="logo-render lay-monogram">
+      <div class="mono-box" style="width:${boxSize}px;height:${boxSize}px;background:${pal.accent}">
+        <span style="font-family:${font};font-size:${44*scale}px;font-weight:800;color:#fff;letter-spacing:-0.04em">${initials}</span>
+      </div>
+    </div>`;
+  }
+  if (b.type==='emblema'){
+    const bs = 124*scale;
+    return `<div class="logo-render lay-badge" style="color:${pal.ink}">
+      <div class="logo-badge" style="width:${bs}px;height:${bs}px">
+        <span class="bdg-line">${b.estab||'desde 2010'}</span>
+        ${svgMark(b.mark, pal, 34*scale)}
+        <span style="font-family:${font};font-size:${15*scale}px;font-weight:700;color:${pal.ink};text-align:center;line-height:1;max-width:90px">${b.name}</span>
+      </div>
+    </div>`;
+  }
+  // simbolo / mascote → mark + name
+  const layout = b.layout || 'stack';
+  const markSize = (layout==='stack'? 60 : 50) * scale;
+  return `<div class="logo-render lay-${layout}">
+    ${svgMark(b.mark, pal, markSize)}
+    ${nameEl()}
+  </div>`;
+}
+
+/* ---------- BRAND DATABASE ---------- */
+const SECTORS = {
+  padaria:      { label:'Padaria & confeitaria', ico:'xicara',     pals:['doce','acolhedor'],          marks:['trigo','xicara','chama'] },
+  distribuidora:{ label:'Distribuidora de alimentos', ico:'crescimento', pals:['confianca','natureza'], marks:['crescimento','hexagono','folha'] },
+  advocacia:    { label:'Advocacia & contábil', ico:'escudo',      pals:['premium','confianca'],       marks:['escudo','diamante','cruz'] },
+  clinica:      { label:'Clínica & saúde',      ico:'cruz',        pals:['saude','confianca'],         marks:['cruz','gota','folha'] },
+  academia:     { label:'Academia & fitness',   ico:'raio',        pals:['energia','tech'],            marks:['raio','crescimento','chama'] },
+  tech:         { label:'Tecnologia & startup', ico:'orbita',      pals:['tech','confianca'],          marks:['orbita','pontos','hexagono'] },
+  beleza:       { label:'Beleza & estética',    ico:'gota',        pals:['vibrante','premium'],        marks:['gota','folha','onda'] },
+  construcao:   { label:'Construção & engenharia', ico:'telhado',  pals:['energia','premium'],         marks:['telhado','montanha','diamante'] },
+  delivery:     { label:'Delivery & food service', ico:'raio',     pals:['energia','vibrante'],        marks:['raio','chama','xicara'] },
+  pet:          { label:'Pet shop & veterinária', ico:'patas',     pals:['acolhedor','natureza'],      marks:['patas','mascote','folha'] },
+  moda:         { label:'Moda & vestuário',     ico:'diamante',    pals:['premium','vibrante'],        marks:['diamante','anel','onda'] },
+  agro:         { label:'Agro & natural',       ico:'folha',       pals:['natureza','acolhedor'],      marks:['folha','trigo','montanha'] },
+};
+
+// company names per sector
+const NAMES = {
+  padaria:      ['Forno Dourado','Pão & Trigo','Doce Manhã','Casa do Pão'],
+  distribuidora:['AlimentaBR','Cesta Norte','Sabor Distribuição','Pólo Alimentos'],
+  advocacia:    ['Mendes Advocacia','Lex Associados','Vértice Jurídico','Barros & Cia'],
+  clinica:      ['Vida Plena','Bem Estar','Clínica Auge','Núcleo Saúde'],
+  academia:     ['Corpo Ativo','Força Total','Pulse Fit','Movimento'],
+  tech:         ['Nuvem','Codeon','Pixel Lab','Órbita Tech'],
+  beleza:       ['Glow Studio','Belle Estética','Aura Beauty','Petála'],
+  construcao:   ['Alicerce','ConstrutaBR','Prumo Engenharia','Marco Zero'],
+  delivery:     ['Já Chegou','Sabor Express','Rápido & Bom','Pede Aí'],
+  pet:          ['Au Mimo','Patas & Cia','Bicho Feliz','Companhia Pet'],
+  moda:         ['Atelier Norte','Urbana','Fio Nobre','Costura'],
+  agro:         ['Raiz Forte','Campo Vivo','Terra Boa','Verde Norte'],
+};
+
+const TYPES  = ['simbolo','wordmark','monograma','emblema','mascote'];
+const STYLES = ['minimalista','geometrico','retro','moderno','organico','elegante'];
+const STYLE_FONT = { minimalista:'moderno', geometrico:'geometrico', retro:'serif', moderno:'moderno', organico:'arredondado', elegante:'serif' };
+const PERSONAS = ['confiavel','inovador','acessivel','premium','ousado'];
+
+// build ~48 brands
+const BRANDS = [];
+let bid = 0;
+Object.keys(NAMES).forEach((sec, si)=>{
+  NAMES[sec].forEach((nm, ni)=>{
+    const cfg = SECTORS[sec];
+    const type  = TYPES[(si+ni) % TYPES.length];
+    const style = STYLES[(si*2+ni) % STYLES.length];
+    const persona = PERSONAS[(si+ni*2) % PERSONAS.length];
+    const palette = cfg.pals[ni % cfg.pals.length];
+    let mark = cfg.marks[ni % cfg.marks.length];
+    if (type==='mascote') mark = (sec==='pet') ? 'mascote' : 'mascote';
+    const font = (type==='emblema'||style==='elegante'||style==='retro') ? 'serif'
+               : (style==='organico') ? 'arredondado'
+               : STYLE_FONT[style];
+    const layout = (ni % 2 === 0) ? 'stack' : 'horizontal';
+    BRANDS.push({
+      id:++bid, name:nm, sector:sec, type, style, persona, palette, mark, font, layout,
+      estab: 'desde ' + (1998 + ((si*4+ni)*3) % 26),
+    });
+  });
+});
+
+/* ---------- INTRO MARKS ---------- */
+(function(){
+  const picks = ['hexagono','folha','raio','orbita','diamante','onda'];
+  const pals = ['confianca','natureza','energia','tech','premium','saude'];
+  document.getElementById('introMarks').innerHTML = picks.map((m,i)=>
+    `<div class="intro-mark">${svgMark(m, PALETTES[pals[i]], 42)}</div>`
+  ).join('');
+})();
+
+/* ---------- QUIZ DEFINITION ---------- */
+const QUESTIONS = [
+  {
+    key:'sector', title:'Qual é o ramo da empresa?',
+    desc:'O setor define muito do repertório visual — uma padaria e um escritório de advocacia falam línguas diferentes.',
+    tip:'<b>Dica do especialista:</b> no Brasil, setores de alimentação e serviços ganham com marcas calorosas; já áreas técnicas e jurídicas pedem sobriedade. Comece pelo seu terreno.',
+    cols:'cols-3',
+    options:Object.keys(SECTORS).map(k=>({ value:k, title:SECTORS[k].label, visualMark:SECTORS[k].ico, visualPal:'confianca' })),
+  },
+  {
+    key:'type', title:'Que tipo de logo combina com você?',
+    desc:'Cada formato resolve um problema diferente de reconhecimento e aplicação.',
+    tip:'<b>Dica do especialista:</b> nomes curtos brilham como <b>wordmark</b>. Nomes longos pedem um <b>símbolo</b> que funcione sozinho no app e na fachada. <b>Emblema</b> passa tradição.',
+    cols:'cols-5',
+    options:[
+      { value:'wordmark',  title:'Wordmark', desc:'Só o nome, bem tipografado', demo:{type:'wordmark',name:'Norte',style:'moderno',palette:'confianca',font:'moderno'} },
+      { value:'monograma', title:'Monograma', desc:'Iniciais em destaque', demo:{type:'monograma',name:'Marco Zero',style:'geometrico',palette:'premium',font:'geometrico'} },
+      { value:'simbolo',   title:'Símbolo + nome', desc:'Ícone ao lado do nome', demo:{type:'simbolo',name:'Verde',mark:'folha',layout:'stack',style:'organico',palette:'natureza',font:'arredondado'} },
+      { value:'emblema',   title:'Emblema', desc:'Selo fechado, tradicional', demo:{type:'emblema',name:'Forno',mark:'trigo',style:'retro',palette:'doce',font:'serif',estab:'desde 1994'} },
+      { value:'mascote',   title:'Mascote', desc:'Personagem que vira marca', demo:{type:'mascote',name:'Mimo',mark:'mascote',layout:'stack',style:'organico',palette:'acolhedor',font:'arredondado'} },
+    ],
+  },
+  {
+    key:'style', title:'Qual estética te atrai mais?',
+    desc:'O estilo é o tom de voz visual da marca — escolha o que faz seu cliente sentir o que você quer.',
+    tip:'<b>Dica do especialista:</b> o <b>minimalista</b> envelhece bem e funciona em qualquer tamanho. O <b>retrô</b> gera afeto e confiança. Fuja de modismos que datam a marca em 2 anos.',
+    cols:'cols-3',
+    options:[
+      { value:'minimalista', title:'Minimalista', desc:'Limpo, direto, atemporal', demo:{type:'simbolo',name:'Auge',mark:'anel',layout:'stack',style:'minimalista',palette:'confianca',font:'moderno'} },
+      { value:'geometrico',  title:'Geométrico', desc:'Formas precisas e firmes', demo:{type:'simbolo',name:'Pólo',mark:'hexagono',layout:'stack',style:'geometrico',palette:'tech',font:'geometrico'} },
+      { value:'retro',       title:'Retrô / artesanal', desc:'Afeto, tradição, calor', demo:{type:'emblema',name:'Casa',mark:'xicara',style:'retro',palette:'doce',font:'serif',estab:'desde 1989'} },
+      { value:'moderno',     title:'Moderno', desc:'Gradiente, dinâmico, atual', demo:{type:'simbolo',name:'Pulse',mark:'raio',layout:'stack',style:'moderno',palette:'tech',font:'moderno'} },
+      { value:'organico',    title:'Orgânico', desc:'Curvas suaves, acolhedor', demo:{type:'simbolo',name:'Pétala',mark:'gota',layout:'stack',style:'organico',palette:'vibrante',font:'arredondado'} },
+      { value:'elegante',    title:'Elegante', desc:'Serifa fina, sofisticado', demo:{type:'wordmark',name:'Atelier',style:'elegante',palette:'premium',font:'serif'} },
+    ],
+  },
+  {
+    key:'persona', title:'Como sua marca deve soar?',
+    desc:'A personalidade orienta peso, cor e movimento do logo.',
+    tip:'<b>Dica do especialista:</b> personalidade não é o que você acha bonito — é o que faz seu cliente confiar e comprar. Escolha pensando em quem está do outro lado.',
+    cols:'cols-5',
+    options:[
+      { value:'confiavel', title:'Confiável', desc:'Sólido e seguro', icoMark:'escudo', icoPal:'confianca' },
+      { value:'inovador',  title:'Inovador',  desc:'À frente do tempo', icoMark:'orbita', icoPal:'tech' },
+      { value:'acessivel', title:'Acessível', desc:'Próximo e amigável', icoMark:'mascote', icoPal:'acolhedor' },
+      { value:'premium',   title:'Premium',   desc:'Sofisticado e raro', icoMark:'diamante', icoPal:'premium' },
+      { value:'ousado',    title:'Ousado',    desc:'Energético e marcante', icoMark:'raio', icoPal:'energia' },
+    ],
+  },
+  {
+    key:'palette', title:'Qual paleta conversa com você?',
+    desc:'A cor é o elemento de marca mais lembrado — e o primeiro a comunicar emoção.',
+    tip:'<b>Dica do especialista:</b> cor tem psicologia e cultura. Verde passa frescor e saúde; azul, confiança; terracota e dourado, aconchego e valor. Escolha pela sensação, não pela moda.',
+    cols:'cols-3',
+    options:Object.keys(PALETTES).map(k=>({ value:k, title:PALETTES[k].name, palette:k })),
+  },
+];
+
+/* ---------- QUIZ ENGINE ---------- */
+const Quiz = {
+  step: 0,            // 0..4 question index
+  answers: {},
+  screen(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.querySelector(`[data-screen="${name}"]`).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },
+  start(){ this.step=0; this.answers={}; this.renderQuestion(); this.screen('quiz'); },
+  restart(){ this.step=0; this.answers={}; this.screen('intro'); this.updateProgress(); document.getElementById('stepPill').textContent='Início'; },
+  updateProgress(){
+    const total = QUESTIONS.length;
+    const done = Object.keys(this.answers).length;
+    document.getElementById('progressBar').style.width = (done/total*100)+'%';
+  },
+  renderQuestion(){
+    const q = QUESTIONS[this.step];
+    document.getElementById('stepPill').textContent = `Pergunta ${this.step+1} / ${QUESTIONS.length}`;
+    document.getElementById('qNum').textContent = `Pergunta ${this.step+1} de ${QUESTIONS.length}`;
+    document.getElementById('qTitle').textContent = q.title;
+    document.getElementById('qDesc').textContent = q.desc;
+    document.getElementById('qTip').innerHTML = q.tip;
+    document.getElementById('btnBack').style.visibility = this.step===0 ? 'hidden' : 'visible';
+    const btnNext = document.getElementById('btnNext');
+    btnNext.disabled = !this.answers[q.key];
+    btnNext.querySelector('svg')?.removeAttribute('hidden');
+    btnNext.childNodes[0].textContent = this.step===QUESTIONS.length-1 ? 'Ver resultado ' : 'Continuar ';
+
+    const grid = document.getElementById('qOptions');
+    grid.className = 'opt-grid ' + (q.cols||'cols-3');
+    grid.innerHTML = q.options.map(o=>{
+      const sel = this.answers[q.key]===o.value;
+      let visual = '';
+      if (o.demo){
+        visual = `<div class="opt-visual tall">${renderLogo(o.demo,{scale:0.82})}</div>`;
+      } else if (o.palette){
+        const sw = PALETTES[o.palette].swatches;
+        visual = `<div class="pal-swatches">${sw.map(c=>`<div style="background:${c}"></div>`).join('')}</div>`;
+      } else if (o.visualMark){
+        visual = `<div class="opt-visual">${svgMark(o.visualMark, PALETTES[o.visualPal||'confianca'], 52)}</div>`;
+      } else if (o.icoMark){
+        visual = `<div class="opt-ico">${svgMark(o.icoMark, PALETTES[o.icoPal], 30)}</div>`;
+      }
+      return `<button class="opt ${sel?'selected':''}" data-val="${o.value}">
+        <div class="opt-check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        ${visual}
+        <div>
+          <div class="opt-title">${o.title}</div>
+          ${o.desc?`<div class="opt-desc">${o.desc}</div>`:''}
+        </div>
+      </button>`;
+    }).join('');
+
+    grid.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        this.answers[q.key] = btn.dataset.val;
+        grid.querySelectorAll('.opt').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('btnNext').disabled = false;
+        this.updateProgress();
+      });
+    });
+    this.updateProgress();
+  },
+  next(){
+    const q = QUESTIONS[this.step];
+    if (!this.answers[q.key]) return;
+    if (this.step < QUESTIONS.length-1){ this.step++; this.renderQuestion(); }
+    else this.showResult();
+  },
+  back(){
+    if (this.step>0){ this.step--; this.renderQuestion(); this.screen('quiz'); }
+  },
+  showResult(){
+    document.getElementById('progressBar').style.width='100%';
+    document.getElementById('stepPill').textContent='Resultado';
+    Result.build(this.answers);
+    this.screen('result');
+  },
+};
+
+/* ---------- RESULT ENGINE ---------- */
+const Result = {
+  build(a){
+    const typeLabel = {wordmark:'Wordmark',monograma:'Monograma',simbolo:'Símbolo + nome',emblema:'Emblema',mascote:'Mascote'}[a.type];
+    const styleLabel = {minimalista:'Minimalista',geometrico:'Geométrico',retro:'Retrô / artesanal',moderno:'Moderno',organico:'Orgânico',elegante:'Elegante'}[a.style];
+    const personaLabel = {confiavel:'Confiável',inovador:'Inovador',acessivel:'Acessível',premium:'Premium',ousado:'Ousado'}[a.persona];
+    const pal = PALETTES[a.palette];
+    const sector = SECTORS[a.sector];
+    const fontKey = (a.style==='elegante'||a.style==='retro')?'serif':(a.style==='organico')?'arredondado':STYLE_FONT[a.style];
+    const fontLabel = {geometrico:'Geométrica (Poppins)',serif:'Serifada (Playfair)',moderno:'Moderna (Space Grotesk)',arredondado:'Arredondada (Quicksand)',manuscrito:'Manuscrita'}[fontKey];
+
+    document.getElementById('resultTitle').innerHTML =
+      `Uma marca <i>${styleLabel.toLowerCase()}</i><br>e ${personaLabel.toLowerCase()}.`;
+
+    /* recommendation cards */
+    document.getElementById('recGrid').innerHTML = `
+      <div class="rec">
+        <div class="rec-label">Formato</div>
+        <div class="rec-value">${typeLabel}</div>
+        <div class="rec-note">Melhor leitura para ${sector.label.toLowerCase()}</div>
+      </div>
+      <div class="rec">
+        <div class="rec-label">Estilo</div>
+        <div class="rec-value">${styleLabel}</div>
+        <div class="rec-note">Tom visual ${personaLabel.toLowerCase()}</div>
+      </div>
+      <div class="rec">
+        <div class="rec-label">Paleta</div>
+        <div class="rec-value">${pal.name}</div>
+        <div class="rec-pal">${pal.swatches.map(c=>`<div style="background:${c}"></div>`).join('')}</div>
+      </div>
+      <div class="rec">
+        <div class="rec-label">Tipografia</div>
+        <div class="rec-value" style="font-size:17px">${fontLabel}</div>
+        <div class="rec-note">Acompanha o estilo escolhido</div>
+      </div>`;
+
+    /* brief — specialist voice */
+    const rationale = {
+      confiavel:'transmita estabilidade: linhas firmes, simetria e cores sóbrias. Evite efeitos que pareçam frágeis.',
+      inovador:'mostre movimento e visão de futuro — formas dinâmicas e um traço de gradiente funcionam bem.',
+      acessivel:'priorize curvas suaves e calor humano: o cliente precisa sentir que pode chegar perto.',
+      premium:'menos é mais. Espaço em branco generoso, contraste alto e um detalhe metálico ou dourado.',
+      ousado:'aposte em contraste forte e um elemento que quebre a simetria — a marca precisa ser lembrada.',
+    }[a.persona];
+
+    document.getElementById('briefBox').innerHTML = `
+      <p class="eyebrow">Briefing de marca</p>
+      <h3 class="serif">O que levar para o designer</h3>
+      <p>Para uma empresa de <b style="color:#fff">${sector.label.toLowerCase()}</b>, a recomendação é um logo no formato
+      <b style="color:#fff">${typeLabel.toLowerCase()}</b>, com estética <b style="color:#fff">${styleLabel.toLowerCase()}</b>
+      e personalidade <b style="color:#fff">${personaLabel.toLowerCase()}</b>. Como a marca quer soar ${personaLabel.toLowerCase()},
+      ${rationale} A paleta <b style="color:#fff">${pal.name}</b> sustenta essa leitura e funciona bem no mercado brasileiro.</p>
+      <div class="brief-cols">
+        <div class="brief-list">
+          <h4>Princípios a seguir</h4>
+          <ul>
+            ${[
+              'Funcione em preto e branco antes de aplicar cor',
+              'Legível a 16px — teste no ícone do app e no rodapé da nota fiscal',
+              'Um conceito só: resista a empilhar símbolo + slogan + selo',
+              'Versão reduzida (só símbolo) para redes e fachada',
+            ].map(t=>`<li><span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>${t}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="brief-list">
+          <h4>Evite</h4>
+          <ul>
+            ${[
+              'Clipart e ícones genéricos de banco de imagem',
+              'Mais de duas fontes na mesma marca',
+              'Degradês exagerados que somem na impressão',
+              'Seguir modismo que data a marca em pouco tempo',
+            ].map(t=>`<li><span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>${t}</li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+
+    /* gallery — score brands against answers */
+    const scored = BRANDS.map(b=>{
+      let s = 0;
+      if (b.type===a.type) s+=3;
+      if (b.style===a.style) s+=3;
+      if (b.palette===a.palette) s+=2;
+      if (b.sector===a.sector) s+=2;
+      if (b.persona===a.persona) s+=1;
+      return {b,s};
+    }).sort((x,y)=>y.s-x.s);
+
+    const top = scored.slice(0,9).map(x=>x.b);
+    const typeName = {wordmark:'Wordmark',monograma:'Monograma',simbolo:'Símbolo',emblema:'Emblema',mascote:'Mascote'};
+    const styleName = {minimalista:'Minimalista',geometrico:'Geométrico',retro:'Retrô',moderno:'Moderno',organico:'Orgânico',elegante:'Elegante'};
+
+    document.getElementById('galleryNote').textContent =
+      `${top.length} marcas da nossa base alinhadas com o seu perfil — ordenadas por afinidade.`;
+    document.getElementById('logoGrid').innerHTML = top.map(b=>`
+      <div class="logo-card">
+        <div class="logo-stage">${renderLogo(b,{scale:1})}</div>
+        <div class="logo-foot">
+          <div>
+            <div class="nm">${b.name}</div>
+            <div class="tg">${SECTORS[b.sector].label}</div>
+          </div>
+          <span class="pill-mini">${styleName[b.style]}</span>
+        </div>
+      </div>
+    `).join('');
+  },
+};
+</script>
+</body>
+</html>
