@@ -246,6 +246,66 @@
     display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   }
   .restart-bar { text-align: center; margin-top: 50px; }
+
+  /* sector study */
+  .study-tag {
+    position: absolute; top: 10px; left: 10px;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    background: rgba(25,25,26,0.78); color: #fff;
+    padding: 3px 7px; border-radius: 5px;
+  }
+  .logo-stage { position: relative; }
+  .sector-card { cursor: pointer; }
+  .sector-card .logo-foot .tg { display: flex; gap: 6px; align-items: center; }
+
+  /* modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(25,25,26,0.5);
+    backdrop-filter: blur(4px); z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%,-48%) scale(0.97);
+    width: min(94vw, 620px); max-height: 86vh; overflow-y: auto;
+    background: var(--card); border-radius: 18px; z-index: 51;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease, transform .22s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.28);
+  }
+  .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+  .modal-stage {
+    height: 200px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(var(--line) 1px, transparent 1px) 0 0/100% 30px, var(--card);
+    border-bottom: 1px solid var(--line); border-radius: 18px 18px 0 0;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .modal-close:hover { border-color: var(--ink); }
+  .modal-body { padding: 26px 28px 30px; }
+  .modal-body h3 { font-size: 28px; }
+  .modal-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .fact {
+    font-size: 12px; color: var(--ink-soft);
+    background: var(--hl); padding: 5px 10px; border-radius: 7px;
+  }
+  .modal-section { margin-top: 22px; }
+  .modal-section h4 {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600; margin-bottom: 8px;
+  }
+  .modal-section p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+  .traits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .trait {
+    font-size: 12.5px; font-weight: 500; color: var(--ink);
+    border: 1px solid var(--line-2); padding: 5px 11px; border-radius: 999px;
+  }
 </style>
 </head>
 <body>
@@ -273,10 +333,15 @@
       <h1 class="serif">Qual é a cara da <i>sua marca?</i></h1>
       <p>Cinco perguntas visuais. A cada escolha entendemos melhor o gosto e a personalidade do seu negócio — e no final entregamos uma direção de logo sob medida, com referências reais.</p>
       <div class="intro-marks" id="introMarks"></div>
-      <button class="btn btn-primary btn-lg" onclick="Quiz.start()">
-        Começar
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </button>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary btn-lg" onclick="Quiz.start()">
+          Começar o teste
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-lg" onclick="Sector.open()">
+          Estudar o setor de distribuição
+        </button>
+      </div>
       <p style="font-size:13px;color:var(--ink-mute);margin-top:18px">Leva 1 minuto · sem cadastro</p>
     </div>
   </section>
@@ -327,6 +392,34 @@
       </button>
     </div>
   </section>
+
+  <!-- SECTOR STUDY -->
+  <section class="screen" data-screen="sector">
+    <div class="q-head">
+      <div class="q-num">Estudo de mercado</div>
+      <h2 class="serif">Distribuição de alimentos no Brasil</h2>
+      <p>Como as grandes redes de atacado e distribuição constroem a própria marca — referências reais do mercado para inspirar a sua.</p>
+      <div class="specialist">
+        <div class="av">M</div>
+        <p><b>Leitura do especialista:</b> o setor se divide em dois mundos visuais. O <b>atacarejo</b> (loja física, preço baixo) usa cores quentes e tipografia pesada para gritar na prateleira e na fachada. Já o <b>atacado distribuidor</b> (B2B, logística) tende ao azul e a marcas sóbrias — vende confiança e entrega, não impulso. As marcas abaixo são interpretações de estudo, não reproduções dos logos originais.</p>
+      </div>
+    </div>
+
+    <div class="filters" id="sectorFilters" style="margin-top:28px;display:flex;gap:8px;flex-wrap:wrap"></div>
+
+    <div class="logo-grid" id="sectorGrid" style="margin-top:20px"></div>
+
+    <div class="restart-bar">
+      <button class="btn btn-ghost" onclick="Quiz.restart()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Voltar ao início
+      </button>
+    </div>
+  </section>
+
+  <!-- ANALYSIS MODAL -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="Sector.close()"></div>
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
 
 </main>
 
@@ -387,6 +480,10 @@ const MARKS = {
   trigo:(i,a)=>`<path d="M32 8V56" stroke="${i}" stroke-width="3.4" stroke-linecap="round"/><g fill="${a}">${[16,25,34,43].map(y=>`<path d="M32 ${y}C26 ${y-3} 22 ${y+1} 21 ${y+7}C27 ${y+6} 31 ${y+3} 32 ${y}Z"/><path d="M32 ${y}C38 ${y-3} 42 ${y+1} 43 ${y+7}C37 ${y+6} 33 ${y+3} 32 ${y}Z"/>`).join('')}</g>`,
   xicara:(i,a)=>`<path d="M14 22H44V40A12 12 0 0 1 32 52H26A12 12 0 0 1 14 40Z" fill="${a}"/><path d="M44 26H50A7 7 0 0 1 50 40H44" fill="none" stroke="${a}" stroke-width="4.5"/><path d="M22 8C20 12 24 14 22 18M32 8C30 12 34 14 32 18" stroke="${i}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
   patas:(i,a)=>`<circle cx="32" cy="40" r="13" fill="${a}"/><circle cx="18" cy="26" r="6.5" fill="${a}"/><circle cx="32" cy="20" r="6.5" fill="${a}"/><circle cx="46" cy="26" r="6.5" fill="${a}"/>`,
+  caixa:(i,a)=>`<path d="M32 6 56 18 32 30 8 18Z" fill="${a}"/><path d="M8 18 32 30V57L8 45Z" fill="${i}"/><path d="M56 18 32 30V57L56 45Z" fill="${a}" fill-opacity="0.78"/><path d="M20 12 44 24" stroke="#fff" stroke-width="2.4" opacity="0.6"/>`,
+  caminhao:(i,a)=>`<rect x="5" y="20" width="31" height="23" rx="2.5" fill="${a}"/><path d="M36 27H47L57 37V43H36Z" fill="${i}"/><circle cx="18" cy="47" r="7" fill="${i}"/><circle cx="45" cy="47" r="7" fill="${i}"/><circle cx="18" cy="47" r="3" fill="#fff"/><circle cx="45" cy="47" r="3" fill="#fff"/>`,
+  pino:(i,a)=>`<path d="M32 5A19 19 0 0 0 13 24c0 14 19 35 19 35s19-21 19-35A19 19 0 0 0 32 5Z" fill="${a}"/><circle cx="32" cy="24" r="8" fill="#fff"/>`,
+  sacola:(i,a)=>`<path d="M14 22H50L47 56H17Z" fill="${a}"/><path d="M23 22V16A9 9 0 0 1 41 16V22" fill="none" stroke="${i}" stroke-width="4" stroke-linecap="round"/>`,
 };
 
 const MARK_KEYS = Object.keys(MARKS);
@@ -645,6 +742,187 @@ const Quiz = {
     this.screen('result');
   },
 };
+
+/* ===================================================================
+   SECTOR STUDY — distribuição de alimentos no Brasil
+   Empresas reais (dados públicos). Marcas exibidas são interpretações
+   de estudo, geradas pelo compositor — NÃO são os logos originais.
+   =================================================================== */
+const DISTRIBUIDORAS = [
+  {
+    nome:'Grupo Martins', local:'Uberlândia · MG', ano:1953, tipo:'distribuidor',
+    porte:'Maior atacadista distribuidor do país',
+    mark:'caminhao', palette:'confianca', font:'geometrico', layout:'horizontal',
+    traits:['Azul corporativo','Wordmark firme','Sóbrio','B2B'],
+    cores:'Azul como cor dominante',
+    nota:'Opera no modelo atacado distribuidor: vende para o pequeno varejo e leva o produto até a porta do lojista. A marca acompanha esse papel — é corporativa, estável e azul. Não precisa gritar preço numa fachada; precisa transmitir confiança logística e solidez de um parceiro de décadas.',
+    licao:'Negócio B2B de distribuição deve priorizar credibilidade sobre impacto. Azul, tipografia limpa e um símbolo que remeta a movimento/entrega comunicam o serviço sem apelar para urgência.',
+  },
+  {
+    nome:'Atacadão', local:'São Paulo · SP', ano:1962, tipo:'atacarejo',
+    porte:'Maior rede de atacarejo do Brasil',
+    mark:'caixa', palette:'energia', font:'geometrico', layout:'stack',
+    traits:['Cor quente','Tipografia pesada','Alto contraste','Fachada'],
+    cores:'Amarelo associado à marca',
+    nota:'Atacarejo puro: loja física grande, preço baixo, giro alto. A marca é construída para a prateleira e para a fachada vista da avenida — letra pesada, cor quente e leitura instantânea a 50 metros. Tudo serve à percepção de economia.',
+    licao:'No varejo de preço, a marca trabalha a favor da economia percebida: cor quente, peso tipográfico alto e zero refinamento desnecessário. Sofisticação aqui afasta o público.',
+  },
+  {
+    nome:'Assaí Atacadista', local:'São Paulo · SP', ano:1974, tipo:'atacarejo',
+    porte:'Uma das maiores redes de atacarejo do país',
+    mark:'sacola', palette:'energia', font:'geometrico', layout:'stack',
+    traits:['Laranja vibrante','Bold','Energético','Acessível'],
+    cores:'Laranja como assinatura',
+    nota:'Posicionamento de atacarejo com forte presença nacional. A identidade aposta em cor vibrante e tipografia robusta — comunica energia, movimento e acessibilidade. O laranja diferencia da concorrência num setor saturado de vermelho e amarelo.',
+    licao:'Quando o setor inteiro usa as mesmas cores, escolher um tom adjacente (laranja onde todos usam vermelho) é diferenciação barata e eficaz. Cor é a memória mais rápida da marca.',
+  },
+  {
+    nome:'Tenda Atacado', local:'São Paulo · SP', ano:1974, tipo:'atacarejo',
+    porte:'Rede de atacarejo com forte presença em SP',
+    mark:'pino', palette:'energia', font:'geometrico', layout:'horizontal',
+    traits:['Vermelho','Direto','Regional','Preço'],
+    cores:'Vermelho de impacto',
+    nota:'Atacarejo regional forte. Marca direta, sem rodeios, ancorada no vermelho — a cor mais associada a oferta e urgência no varejo brasileiro. A comunicação gira em torno de preço e proximidade com o bairro.',
+    licao:'Marca regional ganha citando o território e indo direto ao ponto. Vermelho funciona, mas é o tom mais disputado — só compensa com um símbolo ou tipografia que destaque.',
+  },
+  {
+    nome:'Roldão Atacadista', local:'São Paulo · SP', ano:1965, tipo:'atacarejo',
+    porte:'Tradicional rede paulista de atacarejo',
+    mark:'caixa', palette:'energia', font:'geometrico', layout:'stack',
+    traits:['Tradição','Cor quente','Familiar','Bold'],
+    cores:'Vermelho e amarelo',
+    nota:'Uma das redes mais antigas do segmento em São Paulo. A marca carrega herança familiar e usa a dupla quente clássica do varejo. A longevidade vira ativo: o nome conhecido reduz a necessidade de um símbolo elaborado.',
+    licao:'Marca com história deve preservar o que o cliente já reconhece. Redesenho radical joga fora décadas de memória — evolução sutil costuma render mais que ruptura.',
+  },
+  {
+    nome:'Fort Atacadista', local:'Chapecó · SC', ano:1981, tipo:'atacarejo',
+    porte:'Rede do Grupo Pereira, forte no Sul e Centro-Oeste',
+    mark:'escudo', palette:'energia', font:'geometrico', layout:'horizontal',
+    traits:['Nome-conceito','Vermelho','Robusto','Confiável'],
+    cores:'Vermelho dominante',
+    nota:'O próprio nome — "Fort" — carrega o conceito de força e solidez, e a identidade reforça isso com peso visual e cor quente. Quando o nome já comunica o atributo, o logo só precisa amplificá-lo, não explicá-lo.',
+    licao:'Um bom nome faz metade do trabalho do logo. Se o nome já diz o conceito (força, rapidez, economia), o desenho deve apenas reforçar — não competir com outra ideia.',
+  },
+  {
+    nome:'Mart Minas', local:'Contagem · MG', ano:1992, tipo:'atacarejo',
+    porte:'Maior atacarejo de capital mineiro',
+    mark:'crescimento', palette:'natureza', font:'geometrico', layout:'stack',
+    traits:['Verde','Regional','Crescimento','Mineiro'],
+    cores:'Verde na identidade',
+    nota:'Atacarejo mineiro em forte expansão. O verde foge do vermelho-amarelo padrão do setor e cria associação com frescor e produto de alimentação. O nome ancora o orgulho regional — ativo poderoso no interior.',
+    licao:'Identidade regional bem trabalhada é vantagem, não limitação. Citar a origem (Minas) gera pertencimento; uma cor fora do padrão do setor garante o destaque na avenida.',
+  },
+  {
+    nome:'Villefort Atacadista', local:'Contagem · MG', ano:1974, tipo:'atacarejo',
+    porte:'Rede mineira de atacarejo e varejo',
+    mark:'hexagono', palette:'energia', font:'geometrico', layout:'horizontal',
+    traits:['Vermelho','Híbrido','Sólido','Familiar'],
+    cores:'Vermelho de varejo',
+    nota:'Rede mineira que transita entre atacado e varejo. A marca precisa servir aos dois públicos — o lojista que compra em volume e o consumidor final — e por isso mantém leitura simples e robusta, sem se prender a um único nicho.',
+    licao:'Marca que atende públicos diferentes deve ser neutra o suficiente para caber em todos os contextos. Excesso de personalidade num lado afasta o outro.',
+  },
+  {
+    nome:'Giga Atacado', local:'Cuiabá · MT', ano:2014, tipo:'atacarejo',
+    porte:'Atacarejo em expansão no Centro-Oeste',
+    mark:'caixa', palette:'confianca', font:'moderno', layout:'stack',
+    traits:['Nome-escala','Moderno','Expansão','Volume'],
+    cores:'Identidade contemporânea',
+    nota:'Rede mais nova, nascida já no modelo atacarejo consolidado. O nome comunica escala e volume diretamente. Por ser recente, tem liberdade para uma identidade mais contemporânea, sem o peso de uma herança a preservar.',
+    licao:'Marca nova tem o luxo de começar atual — sem legado para proteger. Vale usar isso para parecer moderna num setor visualmente conservador, sem exagerar e perder a leitura de preço.',
+  },
+];
+
+const Sector = {
+  filter:'all',
+  open(){
+    Quiz.screen('sector');
+    document.getElementById('stepPill').textContent = 'Estudo do setor';
+    document.getElementById('progressBar').style.width = '0%';
+    this.renderFilters();
+    this.renderGrid();
+  },
+  brandOf(d){
+    return { name:d.nome, type:'simbolo', mark:d.mark, layout:d.layout,
+             style:'geometrico', palette:d.palette, font:d.font };
+  },
+  renderFilters(){
+    const opts = [
+      { id:'all', label:'Todas' },
+      { id:'atacarejo', label:'Atacarejo (loja física)' },
+      { id:'distribuidor', label:'Atacado distribuidor (B2B)' },
+    ];
+    document.getElementById('sectorFilters').innerHTML = opts.map(o=>
+      `<button class="chip ${this.filter===o.id?'selected':''}" data-sf="${o.id}"
+        style="font-size:13px;padding:8px 14px;border-radius:8px;border:1.5px solid ${this.filter===o.id?'var(--ink)':'var(--line)'};background:${this.filter===o.id?'var(--ink)':'transparent'};color:${this.filter===o.id?'var(--paper)':'var(--ink-soft)'};cursor:pointer;font-weight:500">${o.label}</button>`
+    ).join('');
+    document.querySelectorAll('#sectorFilters [data-sf]').forEach(b=>{
+      b.addEventListener('click',()=>{ this.filter=b.dataset.sf; this.renderFilters(); this.renderGrid(); });
+    });
+  },
+  renderGrid(){
+    const list = DISTRIBUIDORAS.filter(d=>this.filter==='all'||d.tipo===this.filter);
+    const tipoLabel = { atacarejo:'Atacarejo', distribuidor:'Atacado distribuidor' };
+    document.getElementById('sectorGrid').innerHTML = list.map((d,idx)=>`
+      <div class="logo-card sector-card" data-idx="${DISTRIBUIDORAS.indexOf(d)}">
+        <div class="logo-stage">
+          <span class="study-tag">Interpretação de estudo</span>
+          ${renderLogo(this.brandOf(d),{scale:0.96})}
+        </div>
+        <div class="logo-foot">
+          <div>
+            <div class="nm">${d.nome}</div>
+            <div class="tg">${d.local} · desde ${d.ano}</div>
+          </div>
+          <span class="pill-mini">${tipoLabel[d.tipo]}</span>
+        </div>
+      </div>
+    `).join('');
+    document.querySelectorAll('#sectorGrid .sector-card').forEach(c=>{
+      c.addEventListener('click',()=>this.openModal(+c.dataset.idx));
+    });
+  },
+  openModal(idx){
+    const d = DISTRIBUIDORAS[idx];
+    const tipoLabel = { atacarejo:'Atacarejo · loja física', distribuidor:'Atacado distribuidor · B2B' };
+    document.getElementById('modal').innerHTML = `
+      <div class="modal-stage">
+        <span class="study-tag">Interpretação de estudo · não é o logo original</span>
+        <button class="modal-close" onclick="Sector.close()" aria-label="Fechar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        ${renderLogo(this.brandOf(d),{scale:1.15})}
+      </div>
+      <div class="modal-body">
+        <p class="eyebrow">${tipoLabel[d.tipo]}</p>
+        <h3 class="serif">${d.nome}</h3>
+        <div class="modal-facts">
+          <span class="fact">📍 ${d.local}</span>
+          <span class="fact">Desde ${d.ano}</span>
+          <span class="fact">${d.porte}</span>
+          <span class="fact">${d.cores}</span>
+        </div>
+        <div class="modal-section">
+          <h4>Traços visuais da categoria</h4>
+          <div class="traits">${d.traits.map(t=>`<span class="trait">${t}</span>`).join('')}</div>
+        </div>
+        <div class="modal-section">
+          <h4>Leitura do especialista</h4>
+          <p>${d.nota}</p>
+        </div>
+        <div class="modal-section">
+          <h4>O que a sua marca pode aprender</h4>
+          <p>${d.licao}</p>
+        </div>
+      </div>`;
+    document.getElementById('modalBackdrop').classList.add('open');
+    document.getElementById('modal').classList.add('open');
+  },
+  close(){
+    document.getElementById('modalBackdrop').classList.remove('open');
+    document.getElementById('modal').classList.remove('open');
+  },
+};
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') Sector.close(); });
 
 /* ---------- RESULT ENGINE ---------- */
 const Result = {
